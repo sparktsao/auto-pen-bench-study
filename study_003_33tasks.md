@@ -257,6 +257,91 @@ This study provides a comprehensive analysis of all 33 penetration testing tasks
 | Cryptography | 192.168.4.0/24 | Custom Crypto | Advanced-Expert |
 | Real-World CVE | 192.168.5.0/24 | Production Apps | Real-World |
 
+## Data Configuration Source Analysis
+
+### Complete Benchmark Configuration: `/data/games.json`
+
+**YES** - The `data/games.json` file contains **ALL** benchmark data configuration for the 33 tasks. This single JSON file serves as the **central configuration repository** for the entire AutoPenBench system.
+
+#### Configuration Structure
+```json
+{
+  "in-vitro": {
+    "access_control": [5 tasks],
+    "web_security": [7 tasks], 
+    "network_security": [6 tasks],
+    "cryptography": [4 tasks]
+  },
+  "real-world": {
+    "cve": [11 tasks]
+  }
+}
+```
+
+#### Task Configuration Schema
+Each task contains exactly **4 core fields**:
+```json
+{
+  "task": "Detailed task description with specific instructions",
+  "flag": "16-character alphanumeric flag (success criteria)",
+  "target": "Docker service name (environment identifier)", 
+  "vulnerability": "Vulnerability type description",
+  "alias": "CVE alias name (real-world tasks only)"
+}
+```
+
+#### Configuration Completeness Verification
+
+| Category | Tasks in JSON | Tasks in Codebase | Match |
+|----------|---------------|-------------------|-------|
+| Access Control | 5 | 5 (vm0-vm4) | ✅ |
+| Web Security | 7 | 7 (vm0-vm6) | ✅ |
+| Network Security | 6 | 6 (vm0-vm5) | ✅ |
+| Cryptography | 4 | 4 (vm0-vm3) | ✅ |
+| Real-World CVE | 11 | 11 (vm0-vm10) | ✅ |
+| **Total** | **33** | **33** | ✅ |
+
+#### Key Configuration Insights
+
+**1. Standardized Task Descriptions**
+- **Access Control**: Identical base description with network-specific details
+- **Web Security**: Consistent format with service interaction focus
+- **Network Security**: Large network discovery emphasis (192.168.0.0/16)
+- **Cryptography**: Crypto service analysis and attack methodology
+- **Real-World CVE**: Metasploit-focused exploitation approach
+
+**2. Flag Management**
+- **All flags are exactly 16 characters** (alphanumeric)
+- **Unique per task** - no flag reuse across 33 tasks
+- **Deterministic validation** - exact string matching
+- **Success criteria** - binary pass/fail based on flag submission
+
+**3. Target Naming Convention**
+```
+Format: {level}_{category}_vm{id}
+Examples:
+- in-vitro_access_control_vm0
+- in-vitro_web_security_vm3  
+- real-world_cve_vm7
+```
+
+**4. Vulnerability Classification**
+- **In-vitro**: Educational vulnerability descriptions
+- **Real-world**: CVE identifiers with application aliases
+
+#### Configuration Usage in System
+```python
+# Driver loads configuration from games.json
+game = load_data('in-vitro')['access_control'][0]
+driver = PentestDriver(game['task'], game['flag'], game['target'])
+
+# All task parameters come from this single source
+task_description = game['task']      # LLM instructions
+success_flag = game['flag']          # Validation criteria  
+target_service = game['target']      # Docker service name
+vuln_type = game['vulnerability']    # Classification
+```
+
 ## Conclusion
 
 AutoPenBench's 33 tasks represent a comprehensive and diverse benchmark for evaluating automated penetration testing capabilities. The benchmark successfully addresses key challenges in cybersecurity education and LLM evaluation:
